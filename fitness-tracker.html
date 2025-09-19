@@ -1,27 +1,871 @@
-<!-- fitness-tracker.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fitness Tracker Project</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Tracker Project - Yagnik N. Patel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f7;
+            --bg-tertiary: #fbfbfd;
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+            --accent-blue: #007aff;
+            --accent-green: #30d158;
+            --accent-orange: #ff9500;
+            --accent-pink: #ff2d92;
+            --border: rgba(0, 0, 0, 0.08);
+            --glass: rgba(255, 255, 255, 0.8);
+            --glass-light: rgba(255, 255, 255, 0.1);
+            --shadow: rgba(0, 0, 0, 0.04);
+            --shadow-hover: rgba(0, 0, 0, 0.12);
+            --radius: 24px;
+            --radius-small: 12px;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #000000;
+            --bg-secondary: #161617;
+            --bg-tertiary: #1c1c1e;
+            --text-primary: #f5f5f7;
+            --text-secondary: #86868b;
+            --accent-blue: #007aff;
+            --accent-green: #30d158;
+            --accent-orange: #ff9500;
+            --accent-pink: #ff2d92;
+            --border: rgba(255, 255, 255, 0.08);
+            --glass: rgba(28, 28, 30, 0.8);
+            --glass-light: rgba(255, 255, 255, 0.1);
+            --shadow: rgba(0, 0, 0, 0.3);
+            --shadow-hover: rgba(0, 0, 0, 0.5);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+            line-height: 1.47059;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            overflow-x: hidden;
+            transition: all 0.4s cubic-bezier(0.28, 0.11, 0.32, 1);
+        }
+
+        /* Background Elements */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                rgba(0, 122, 255, 0.05) 0%,
+                rgba(48, 209, 88, 0.05) 25%,
+                rgba(255, 149, 0, 0.05) 50%,
+                rgba(255, 45, 146, 0.05) 75%,
+                rgba(0, 122, 255, 0.05) 100%);
+            z-index: -2;
+            animation: gradientShift 15s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, 
+                rgba(0, 122, 255, 0.1), 
+                rgba(48, 209, 88, 0.1));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .floating-circle:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            top: 10%;
+            left: 80%;
+            animation-delay: 0s;
+        }
+
+        .floating-circle:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            top: 60%;
+            left: 10%;
+            animation-delay: -7s;
+        }
+
+        .floating-circle:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            top: 30%;
+            left: 20%;
+            animation-delay: -14s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(120deg); }
+            66% { transform: translateY(20px) rotate(240deg); }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 70px;
+            background: linear-gradient(135deg, var(--glass), rgba(255, 255, 255, 0.05));
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.28, 0.11, 0.32, 1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            width: 100%;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--glass), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.28, 0.11, 0.32, 1);
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(0, 122, 255, 0.05));
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.15);
+        }
+
+        .theme-toggle {
+            background: linear-gradient(135deg, var(--glass), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 18px;
+            padding: 12px;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.28, 0.11, 0.32, 1);
+            cursor: pointer;
+        }
+
+        .theme-toggle:hover {
+            background: linear-gradient(135deg, var(--glass-light), rgba(255, 255, 255, 0.1));
+            transform: translateY(-2px) rotate(180deg);
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 32px 80px;
+            min-height: 100vh;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 80px;
+            opacity: 0;
+            animation: fadeInUp 1.2s cubic-bezier(0.28, 0.11, 0.32, 1) forwards 0.3s;
+        }
+
+        .project-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            border-radius: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin: 0 auto 32px;
+            box-shadow: 0 20px 60px rgba(48, 209, 88, 0.25);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .hero-title {
+            font-size: clamp(48px, 8vw, 72px);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 24px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.4;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(48px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Content Cards */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 32px;
+            margin-bottom: 80px;
+        }
+
+        .glass-card {
+            background: linear-gradient(135deg, var(--glass), rgba(255, 255, 255, 0.05));
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.28, 0.11, 0.32, 1);
+            opacity: 0;
+            transform: translateY(32px);
+            animation: fadeInUp 1.2s cubic-bezier(0.28, 0.11, 0.32, 1) forwards;
+        }
+
+        .glass-card:nth-child(2) { animation-delay: 0.1s; }
+        .glass-card:nth-child(3) { animation-delay: 0.2s; }
+        .glass-card:nth-child(4) { animation-delay: 0.3s; }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
+            opacity: 0;
+            transition: opacity 0.3s cubic-bezier(0.28, 0.11, 0.32, 1);
+            pointer-events: none;
+        }
+
+        .glass-card:hover::before {
+            opacity: 1;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 60px var(--shadow-hover);
+            border-color: rgba(0, 122, 255, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .card-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+        }
+
+        .card-icon.orange {
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-pink));
+        }
+
+        .card-icon.green {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+        }
+
+        .card-icon.pink {
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-orange));
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-content {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .card-content p {
+            margin-bottom: 16px;
+        }
+
+        /* Feature List */
+        .features-card {
+            grid-column: 1 / -1;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 24px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.28, 0.11, 0.32, 1);
+        }
+
+        .feature-item:hover {
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.05), rgba(0, 122, 255, 0.02));
+            border-color: rgba(0, 122, 255, 0.2);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .feature-text h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .feature-text p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin: 80px 0;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 32px;
+            background: linear-gradient(135deg, var(--glass), rgba(255, 255, 255, 0.05));
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: all 0.4s cubic-bezier(0.28, 0.11, 0.32, 1);
+            opacity: 0;
+            transform: translateY(32px);
+            animation: fadeInUp 1.2s cubic-bezier(0.28, 0.11, 0.32, 1) forwards 0.8s;
+        }
+
+        .stat-card:nth-child(2) { animation-delay: 0.9s; }
+        .stat-card:nth-child(3) { animation-delay: 1.0s; }
+        .stat-card:nth-child(4) { animation-delay: 1.1s; }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 80px 40px;
+            background: linear-gradient(135deg, var(--glass), rgba(255, 255, 255, 0.05));
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(32px);
+            animation: fadeInUp 1.2s cubic-bezier(0.28, 0.11, 0.32, 1) forwards 1.2s;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(0, 122, 255, 0.05), 
+                rgba(48, 209, 88, 0.05));
+            opacity: 0.5;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .cta-text {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.28, 0.11, 0.32, 1);
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+            color: white;
+            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(0, 122, 255, 0.35);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--glass), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, var(--glass-light), rgba(255, 255, 255, 0.1));
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 20px;
+            }
+
+            .container {
+                padding: 100px 20px 60px;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .floating-circle {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-section {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .hero-subtitle {
+                font-size: 18px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <section class="project-details">
-    <h1>Fitness Tracker</h1>
-    <p>
-      The Fitness Tracker is a cross-platform mobile app built with Flutter. 
-      It includes workout planning, progress tracking, and wearable device 
-      integration. Users can create custom plans, monitor heart rate data, 
-      and sync results across devices.
-    </p>
-    <ul>
-      <li>Workout planning and scheduling</li>
-      <li>Progress charts and statistics</li>
-      <li>Integration with smartwatches and fitness bands</li>
-    </ul>
-    <a href="index.html">← Back to Projects</a>
-  </section>
+    <div class="bg-gradient"></div>
+    <div class="floating-elements">
+        <div class="floating-circle"></div>
+        <div class="floating-circle"></div>
+        <div class="floating-circle"></div>
+    </div>
+
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="back-btn">
+                ← Back to Projects
+            </a>
+            <button class="theme-toggle" id="themeToggle">🌙</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero-section">
+            <div class="project-icon">📱</div>
+            <h1 class="hero-title">Fitness Tracker</h1>
+            <p class="hero-subtitle">A comprehensive cross-platform mobile application that transforms how users approach fitness with intelligent planning, real-time monitoring, and seamless device integration.</p>
+        </div>
+
+        <div class="content-grid">
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-icon blue">🏃‍♂️</div>
+                    <div>
+                        <h3 class="card-title">Smart Tracking</h3>
+                        <p class="card-subtitle">Real-time Monitoring</p>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <p>Advanced algorithms track your workouts with precision, monitoring heart rate, calories burned, and performance metrics in real-time. The app learns from your patterns to provide personalized insights and recommendations.</p>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-icon orange">📊</div>
+                    <div>
+                        <h3 class="card-title">Progress Analytics</h3>
+                        <p class="card-subtitle">Data-driven Insights</p>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <p>Beautiful charts and detailed statistics help you visualize your progress over time. Track trends, set goals, and celebrate milestones with comprehensive analytics that make fitness data meaningful.</p>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <div class="card-header">
+                    <div class="card-icon green">⌚</div>
+                    <div>
+                        <h3 class="card-title">Device Integration</h3>
+                        <p class="card-subtitle">Seamless Connectivity</p>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <p>Connect with popular smartwatches and fitness bands for automatic data synchronization. Your fitness data flows seamlessly across all your devices, ensuring you never miss a workout detail.</p>
+                </div>
+            </div>
+
+            <div class="glass-card features-card">
+                <div class="card-header">
+                    <div class="card-icon pink">✨</div>
+                    <div>
+                        <h3 class="card-title">Key Features</h3>
+                        <p class="card-subtitle">Complete Fitness Solution</p>
+                    </div>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">📅</div>
+                        <div class="feature-text">
+                            <h4>Workout Planning</h4>
+                            <p>Create custom workout schedules tailored to your fitness goals and lifestyle preferences</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">📈</div>
+                        <div class="feature-text">
+                            <h4>Progress Charts</h4>
+                            <p>Visual representations of your fitness journey with detailed statistics and trends</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">💓</div>
+                        <div class="feature-text">
+                            <h4>Heart Rate Monitoring</h4>
+                            <p>Real-time heart rate tracking with zone-based training recommendations</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">☁️</div>
+                        <div class="feature-text">
+                            <h4>Cloud Sync</h4>
+                            <p>Automatic backup and synchronization across all your connected devices</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-text">
+                            <h4>Goal Setting</h4>
+                            <p>Set and track personalized fitness goals with milestone celebrations</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🏆</div>
+                        <div class="feature-text">
+                            <h4>Achievement System</h4>
+                            <p>Gamified experience with badges and rewards to keep you motivated</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-number">50K+</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">98%</div>
+                <div class="stat-label">Satisfaction Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">15+</div>
+                <div class="stat-label">Device Integrations</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">4.8★</div>
+                <div class="stat-label">App Store Rating</div>
+            </div>
+        </div>
+
+        <div class="cta-section">
+            <div class="cta-content">
+                <h2 class="cta-title">Ready to Transform Your Fitness Journey?</h2>
+                <p class="cta-text">Join thousands of users who have already discovered the power of intelligent fitness tracking. Download the app today and start your personalized fitness adventure.</p>
+                <div class="cta-buttons">
+                    <a href="#" class="btn btn-primary">Download App</a>
+                    <a href="#" class="btn btn-secondary">View Demo</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+
+        const currentTheme = sessionStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            body.setAttribute('data-theme', 'dark');
+            themeToggle.textContent = '☀️';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const theme = body.getAttribute('data-theme');
+            themeToggle.style.transform = 'rotate(180deg) scale(0.8)';
+
+            setTimeout(() => {
+                if (theme === 'dark') {
+                    body.removeAttribute('data-theme');
+                    themeToggle.textContent = '🌙';
+                    sessionStorage.setItem('theme', 'light');
+                } else {
+                    body.setAttribute('data-theme', 'dark');
+                    themeToggle.textContent = '☀️';
+                    sessionStorage.setItem('theme', 'dark');
+                }
+                themeToggle.style.transform = 'rotate(0deg) scale(1)';
+            }, 200);
+        });
+
+        // Scroll effects for navigation
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            const scrolled = window.pageYOffset;
+            
+            if (scrolled > 20) {
+                nav.style.background = 'rgba(255, 255, 255, 0.9)';
+                nav.style.backdropFilter = 'saturate(180%) blur(20px)';
+            } else {
+                nav.style.background = 'rgba(255, 255, 255, ' + (scrolled / 20 * 0.8) + ')';
+                nav.style.backdropFilter = 'saturate(' + (100 + scrolled) + '%) blur(' + (scrolled / 2) + 'px)';
+            }
+        });
+
+        // Smooth scroll for back button
+        document.querySelector('.back-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            window.history.back();
+        });
+
+        // Interactive card effects
+        const cards = document.querySelectorAll('.glass-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-12px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(-12px)';
+            });
+        });
+
+        // Parallax effect for floating elements
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const circles = document.querySelectorAll('.floating-circle');
+            
+            circles.forEach((circle, index) => {
+                const speed = 0.5 + (index * 0.2);
+                circle.style.transform = `translateY(${scrolled * speed}px) rotate(${scrolled * 0.1}deg)`;
+            });
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for scroll animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const animateElements = document.querySelectorAll('.glass-card, .stat-card, .cta-section');
+            animateElements.forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
 </body>
 </html>
